@@ -1,0 +1,563 @@
+     1→<!DOCTYPE html>
+     2→<html lang="es">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<title>Vocabulario Chino–Español · Proyecto El Domo</title>
+     7→<style>
+     8→:root{
+     9→  --navy:#0B1C2C; --navy2:#12293e; --teal:#529286; --teal-d:#3f7a6f;
+    10→  --bg:#eef2f1; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+    11→  --red:#dc2626; --green:#16a34a; --amber:#d97706; --line:#d7e0dd;
+    12→}
+    13→*{box-sizing:border-box;margin:0;padding:0}
+    14→body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    15→.cjk{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","WenQuanYi Zen Hei",sans-serif}
+    16→header{background:var(--navy);color:#fff;padding:28px 16px 22px}
+    17→.wrap{max-width:960px;margin:0 auto}
+    18→h1{font-size:clamp(22px,4vw,30px);letter-spacing:.3px}
+    19→.sub{color:#b8c4cc;font-size:14px;margin-top:6px}
+    20→.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    21→.chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px;font-size:13px}
+    22→.chip b{color:#8fd3c6}
+    23→.gbar{height:10px;background:rgba(255,255,255,.15);border-radius:999px;margin-top:14px;overflow:hidden}
+    24→.gfill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),#7fc4b5);transition:width .4s}
+    25→.deco{position:fixed;right:-14px;top:120px;font-size:120px;opacity:.05;pointer-events:none;user-select:none}
+    26→main{max-width:960px;margin:0 auto;padding:16px}
+    27→/* filtros */
+    28→.filters{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 1px 3px rgba(11,28,44,.06)}
+    29→.pill{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;cursor:pointer;transition:.15s}
+    30→.pill:hover{border-color:var(--teal)}
+    31→.pill.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+    32→select{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px;background:#fff;color:var(--text);max-width:100%}
+    33→.deckn{margin-left:auto;font-size:13px;color:var(--muted)}
+    34→.deckn b{color:var(--teal-d)}
+    35→/* tabs */
+    36→.tabs{display:flex;gap:8px;margin:16px 0;overflow-x:auto;padding-bottom:2px}
+    37→.tab{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap;transition:.15s}
+    38→.tab.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+    39→.mode{display:none}
+    40→.mode.on{display:block;animation:pop .25s ease}
+    41→@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    42→.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(11,28,44,.06)}
+    43→/* flashcards */
+    44→.fccenter{text-align:center}
+    45→.flip{perspective:1400px;max-width:420px;margin:0 auto;cursor:pointer}
+    46→.flipin{position:relative;min-height:300px;transform-style:preserve-3d;transition:transform .5s}
+    47→.flip.fl .flipin{transform:rotateY(180deg)}
+    48→.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid var(--line);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px}
+    49→.face.front{background:linear-gradient(160deg,#fff,#f4faf8)}
+    50→.face.back{background:linear-gradient(160deg,#f0f7f5,#e7f1ee);transform:rotateY(180deg)}
+    51→.hanzi{font-size:56px;line-height:1.15;font-weight:700}
+    52→.pinyin{font-size:26px;color:var(--teal-d);font-style:italic;letter-spacing:.5px}
+    53→.esptxt{font-size:21px;color:var(--text)}
+    54→.secbtn{position:absolute;top:10px;right:10px;background:var(--teal);border:none;color:#fff;border-radius:999px;width:40px;height:40px;font-size:18px;cursor:pointer;transition:.15s}
+    55→.secbtn:hover{background:var(--teal-d)}
+    56→.badge{position:absolute;top:14px;left:14px;font-size:11px;color:var(--muted);background:#f1f5f4;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+    57→.lmark{position:absolute;bottom:12px;right:14px;font-size:12px;color:var(--green);font-weight:600}
+    58→.fcrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
+    59→.btn{border:none;border-radius:12px;padding:11px 18px;font-size:14.5px;cursor:pointer;transition:.15s;background:var(--navy);color:#fff}
+    60→.btn:hover{filter:brightness(1.15)}
+    61→.btn.ghost{background:#fff;color:var(--text);border:1.5px solid var(--line)}
+    62→.btn.good{background:var(--green)}
+    63→.btn.bad{background:var(--red)}
+    64→.btn.warn{background:var(--amber)}
+    65→.btn:disabled{opacity:.45;cursor:not-allowed}
+    66→.fmeta{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:14px;font-size:13px;color:var(--muted)}
+    67→.mbar{width:180px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    68→.mfill{height:100%;background:var(--teal);width:0;transition:width .3s}
+    69→/* quiz */
+    70→.qq{max-width:560px;margin:0 auto;text-align:center}
+    71→.qtag{font-size:13px;color:var(--muted);margin-bottom:8px}
+    72→.qword{font-size:40px;font-weight:700;margin:8px 0 2px}
+    73→.qword.lat{font-size:26px;font-weight:600}
+    74→.qopts{display:grid;gap:10px;margin-top:18px}
+    75→.opt{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:13px 14px;font-size:15.5px;cursor:pointer;text-align:center;transition:.15s}
+    76→.opt:hover:not(:disabled){border-color:var(--teal);background:#f4faf8}
+    77→.opt.ok{background:#e8f7ee;border-color:var(--green);color:#14532d;font-weight:600}
+    78→.opt.ko{background:#fdecec;border-color:var(--red);color:#7f1d1d}
+    79→.opt:disabled{cursor:default}
+    80→.qfoot{margin-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+    81→.final{max-width:420px;margin:30px auto;text-align:center;padding:26px;border:2px solid var(--teal);border-radius:20px;background:#f4faf8}
+    82→.score{font-size:52px;font-weight:800;color:var(--teal-d)}
+    83→/* matching */
+    84→.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin:0 auto}
+    85→@media(max-width:520px){.mrow{grid-template-columns:1fr 1fr}}
+    86→.mcell{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:14px 10px;font-size:17px;cursor:pointer;text-align:center;transition:.15s;user-select:none}
+    87→.mcell.zh{font-size:21px;font-weight:700}
+    88→.mcell.sel{border-color:var(--teal);background:#eef7f5;box-shadow:0 0 0 2px rgba(82,146,134,.25)}
+    89→.mcell.ok{background:#e8f7ee;border-color:var(--green);color:#14532d;cursor:default;opacity:.75}
+    90→.mcell.bad{animation:shake .4s;background:#fdecec;border-color:var(--red)}
+    91→@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+    92→.mhead{display:flex;justify-content:center;gap:16px;margin-bottom:14px;font-size:14px;color:var(--muted)}
+    93→.mtimer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--teal-d)}
+    94→/* lista */
+    95→.search{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:14px;background:#fff}
+    96→.search:focus{outline:2px solid rgba(82,146,134,.35);border-color:var(--teal)}
+    97→.vrow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;background:#fff;transition:.15s}
+    98→.vrow:hover{border-color:var(--teal)}
+    99→.vrow .zh{font-size:24px;font-weight:700;min-width:110px}
+   100→.vrow .py{font-style:italic;color:var(--teal-d);font-size:14px}
+   101→.vrow .sp{font-size:14.5px;flex:1}
+   102→.vrow .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px;white-space:nowrap}
+   103→.mini{border:1.5px solid var(--line);background:#fff;border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;flex:none;transition:.15s}
+   104→.mini:hover{border-color:var(--teal)}
+   105→.mini.learned{background:var(--green);border-color:var(--green);color:#fff}
+   106→.more{width:100%;margin-top:6px}
+   107→.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:14.5px}
+   108→/* crear tarjetas */
+   109→.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+   110→@media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+   111→.lbl{font-size:12.5px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+   112→.inp{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:15.5px;background:#fff;color:var(--text)}
+   113→.inp:focus{outline:2px solid rgba(82,146,134,.35);border-color:var(--teal)}
+   114→.hint{font-size:12.5px;color:var(--muted)}
+   115→.okmsg{color:var(--green);font-size:13.5px;font-weight:600}
+   116→.errmsg{color:var(--red);font-size:13.5px;font-weight:600}
+   117→.mgmt{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
+   118→.mhead2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+   119→.mhead2>span:first-child{font-weight:700}
+   120→.mhead2 b{color:var(--teal-d)}
+   121→textarea.inp{min-height:74px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+   122→footer{max-width:960px;margin:26px auto 40px;padding:0 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;color:var(--muted);font-size:12.5px}
+   123→@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+   124→</style>
+   125→</head>
+   126→<body>
+   127→<div class="deco cjk">学</div>
+   128→<header>
+   129→  <div class="wrap">
+   130→    <h1>Vocabulario Chino–Español</h1>
+   131→    <div class="sub">Proyecto El Domo · términos técnicos constructivos y palabras clave de gestión — fuente: informe quincenal Silvercorp (10/10/2026)</div>
+   132→    <div class="chips">
+   133→      <span class="chip">📚 <b id="stTotal">0</b> palabras</span>
+   134→      <span class="chip">✅ <b id="stLearned">0</b> aprendidas</span>
+   135→      <span class="chip">🎯 <b id="stPct">0%</b> de dominio</span>
+   136→    </div>
+   137→    <div class="gbar"><div class="gfill" id="gfill"></div></div>
+   138→  </div>
+   139→</header>
+   140→<main>
+   141→  <div class="filters">
+   142→    <button class="pill on" data-part="all">Todas</button>
+   143→    <button class="pill" data-part="A">A · Palabras clave</button>
+   144→    <button class="pill" data-part="B">B · Técnico constructivo</button>
+   145→    <select id="secSel"><option value="all">Todas las secciones</option></select>
+   146→    <span class="deckn">Mazo: <b id="deckN">0</b> palabras</span>
+   147→  </div>
+   148→
+   149→  <div class="tabs" role="tablist">
+   150→    <button class="tab on" data-tab="fc" role="tab">📇 Flashcards</button>
+   151→    <button class="tab" data-tab="qz" role="tab">🎯 Quiz</button>
+   152→    <button class="tab" data-tab="mt" role="tab">🔗 Emparejar</button>
+   153→    <button class="tab" data-tab="ls" role="tab">📚 Lista</button>
+   154→    <button class="tab" data-tab="cr" role="tab">➕ Crear</button>
+   155→  </div>
+   156→
+   157→  <!-- FLASHCARDS -->
+   158→  <section class="mode on" id="mode-fc">
+   159→    <div class="panel fccenter" id="fcBox"></div>
+   160→  </section>
+   161→
+   162→  <!-- QUIZ -->
+   163→  <section class="mode" id="mode-qz">
+   164→    <div class="panel" id="qzBox"></div>
+   165→  </section>
+   166→
+   167→  <!-- MATCHING -->
+   168→  <section class="mode" id="mode-mt">
+   169→    <div class="panel" id="mtBox"></div>
+   170→  </section>
+   171→
+   172→  <!-- LIST -->
+   173→  <section class="mode" id="mode-ls">
+   174→    <div class="panel">
+   175→      <input class="search" id="qInput" type="search" placeholder="🔍 Buscar por chino, pinyin o español (sin tonos: baogao → bàogào)">
+   176→      <div id="listBox"></div>
+   177→      <button class="btn ghost more" id="moreBtn" style="display:none">Mostrar más ▼</button>
+   178→    </div>
+   179→  </section>
+   180→
+   181→  <!-- CREAR -->
+   182→  <section class="mode" id="mode-cr">
+   183→    <div class="panel">
+   184→      <div style="font-size:19px;font-weight:700;margin-bottom:4px">➕ Crear nueva tarjeta</div>
+   185→      <div class="hint" style="margin:0 0 14px">Añade tus propias palabras al vocabulario y clasifícalas al instante como palabra clave o término técnico constructivo.</div>
+   186→      <div class="fgrid">
+   187→        <div><span class="lbl">汉字 (caracteres) *</span><input class="inp cjk" id="cZh" placeholder="ej. 钢结构"></div>
+   188→        <div><span class="lbl">Pinyin (opcional)</span><input class="inp" id="cPy" placeholder="ej. gāngjiégòu"></div>
+   189→      </div>
+   190→      <div style="margin-top:12px"><span class="lbl">Significado en español *</span><input class="inp" id="cEs" placeholder="ej. estructura de acero"></div>
+   191→      <div style="margin-top:12px"><span class="lbl">Clasificación *</span>
+   192→        <div style="display:flex;gap:8px;flex-wrap:wrap">
+   193→          <button class="pill" data-np="A">A · Palabra clave de uso general</button>
+   194→          <button class="pill on" data-np="B">B · Técnico constructivo</button>
+   195→        </div>
+   196→        <div class="hint" id="cHint" style="margin-top:6px"></div>
+   197→      </div>
+   198→      <div class="fcrow" style="justify-content:flex-start">
+   199→        <button class="btn good" id="cSave">Guardar tarjeta ✅</button>
+   200→        <span id="cMsg" class="hint" style="align-self:center"></span>
+   201→      </div>
+   202→      <div class="mgmt">
+   203→        <div class="mhead2">
+   204→          <span>Mis tarjetas personalizadas (<b id="cCount">0</b>)</span>
+   205→          <button class="btn ghost" id="cExport" style="font-size:12.5px;padding:7px 12px">Copiar JSON 📋</button>
+   206→          <button class="btn ghost" id="cImpShow" style="font-size:12.5px;padding:7px 12px">Importar JSON 📥</button>
+   207→        </div>
+   208→        <textarea class="inp" id="cImp" style="display:none" placeholder='Pega aquí un JSON: [{"chinese":"试","pinyin":"shì","spanish":"prueba","part":"A"}]'></textarea>
+   209→        <button class="btn" id="cImpBtn" style="display:none;margin-top:8px;font-size:13px">Importar</button>
+   210→        <div id="cList"></div>
+   211→      </div>
+   212→    </div>
+   213→  </section>
+   214→</main>
+   215→<footer>
+   216→  <span>app offline, progreso guardado en este navegador</span>
+   217→  <button class="btn ghost" id="resetBtn" style="font-size:12.5px;padding:8px 12px">Reiniciar progreso</button>
+   218→</footer>
+   219→
+   220→<script>
+   221→const BUILTIN = [{"id":1,"chinese":"报告","pinyin":"bàogào","spanish":"informe / reporte","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":2,"chinese":"双周进展","pinyin":"shuāngzhōu jìnzhǎn","spanish":"avance quincenal","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":3,"chinese":"进展","pinyin":"jìnzhǎn","spanish":"avance / progreso","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":4,"chinese":"概述","pinyin":"gàishù","spanish":"resumen / visión general","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":5,"chinese":"关键进展","pinyin":"guānjiàn jìnzhǎn","spanish":"avances clave","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":6,"chinese":"制约因素","pinyin":"zhìyuē yīnsù","spanish":"factores limitantes","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":7,"chinese":"进度","pinyin":"jìndù","spanish":"avance / cronograma","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":8,"chinese":"计划","pinyin":"jì huà","spanish":"plan; planificar","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":9,"chinese":"下两周计划","pinyin":"xià liǎngzhōu jì huà","spanish":"plan de las próximas dos semanas","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":10,"chinese":"下一步工作","pinyin":"xià yī bù gōngzuò","spanish":"próximos pasos","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":11,"chinese":"包 1 / 包 2 / 包 3","pinyin":"bāo yī / èr / sān","spanish":"Paquete 1 / 2 / 3 (contratos de obra)","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":12,"chinese":"完成","pinyin":"wánchéng","spanish":"completar; ejecutado","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":13,"chinese":"完成率","pinyin":"wánchénglǜ","spanish":"tasa de finalización","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":14,"chinese":"累计","pinyin":"lěijì","spanish":"acumulado","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":15,"chinese":"总计 / 合计","pinyin":"zǒngjì / héjì","spanish":"total / suma","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":16,"chinese":"滞后","pinyin":"zhìhòu","spanish":"rezago / retraso","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":17,"chinese":"会议","pinyin":"huìyì","spanish":"reunión","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":18,"chinese":"周例会","pinyin":"zhōu lì huì","spanish":"reunión semanal","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":19,"chinese":"通报","pinyin":"tōngbào","spanish":"informar / notificar","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":20,"chinese":"审核","pinyin":"shěnhé","spanish":"revisión / revisar","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":21,"chinese":"审批","pinyin":"shěnpī","spanish":"aprobación / trámite de aprobación","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":22,"chinese":"批准","pinyin":"pīzhǔn","spanish":"aprobar; aprobado","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":23,"chinese":"备注","pinyin":"bèizhù","spanish":"observaciones / notas","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":24,"chinese":"变动","pinyin":"biàndòng","spanish":"variación / cambio","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":25,"chinese":"统计","pinyin":"tǒngjì","spanish":"estadística / recuento","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":26,"chinese":"汇总","pinyin":"huìzǒng","spanish":"consolidación / resumen","part":"A","sectionCode":"A.1","sectionTitle":"Gestión de documentos, reportes y reuniones"},{"id":27,"chinese":"日期","pinyin":"rìqī","spanish":"fecha","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":28,"chinese":"截至","pinyin":"jiézhì","spanish":"al corte de / hasta","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":29,"chinese":"目前","pinyin":"mùqián","spanish":"actualmente","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":30,"chinese":"持续","pinyin":"chíxù","spanish":"persistente; continuar","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":31,"chinese":"严重","pinyin":"yánzhòng","spanish":"grave / severo","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":32,"chinese":"影响","pinyin":"yǐngxiǎng","spanish":"impacto; afectar","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":33,"chinese":"双周","pinyin":"shuāngzhōu","spanish":"cada dos semanas / quincenal","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":34,"chinese":"本期","pinyin":"běnqī","spanish":"período actual","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":35,"chinese":"上期","pinyin":"shàngqī","spanish":"período anterior","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":36,"chinese":"每日 / 每天","pinyin":"měi rì / měi tiān","spanish":"a diario / cada día","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":37,"chinese":"月度","pinyin":"yuèdù","spanish":"mensual","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":38,"chinese":"夜间","pinyin":"yèjiān","spanish":"durante la noche","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":39,"chinese":"后续","pinyin":"hòuxù","spanish":"posterior / subsiguiente","part":"A","sectionCode":"A.2","sectionTitle":"Tiempo y referencia"},{"id":40,"chinese":"问题","pinyin":"wèntí","spanish":"problema / asunto","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":41,"chinese":"检查","pinyin":"jiǎnchá","spanish":"inspeccionar / inspección","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":42,"chinese":"措施","pinyin":"cuòshī","spanish":"medidas","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":43,"chinese":"应对措施","pinyin":"yìngduì cuòshī","spanish":"medidas de mitigación / respuesta","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":44,"chinese":"风险","pinyin":"fēngxiǎn","spanish":"riesgo","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":45,"chinese":"要求","pinyin":"yāoqiú","spanish":"requisito / exigencia","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":46,"chinese":"依据","pinyin":"yījù","spanish":"base / fundamento","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":47,"chinese":"结论","pinyin":"jiélùn","spanish":"conclusión","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":48,"chinese":"发现","pinyin":"fāxiàn","spanish":"hallazgo; detectar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":49,"chinese":"跟进","pinyin":"gēnjìn","spanish":"dar seguimiento","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":50,"chinese":"推进","pinyin":"tuījìn","spanish":"impulsar / hacer avanzar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":51,"chinese":"推动","pinyin":"tuīdòng","spanish":"promover","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":52,"chinese":"开展","pinyin":"kāizhǎn","spanish":"llevar a cabo / desarrollar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":53,"chinese":"落实","pinyin":"luòshí","spanish":"implementar / concretar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":54,"chinese":"提交","pinyin":"tíjiāo","spanish":"presentar / someter","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":55,"chinese":"申请","pinyin":"shěnqǐng","spanish":"solicitud; solicitar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":56,"chinese":"取得","pinyin":"qǔdé","spanish":"obtener","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":57,"chinese":"签署","pinyin":"qiānshǔ","spanish":"firmar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":58,"chinese":"签发","pinyin":"qiānfā","spanish":"emitir (documento)","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":59,"chinese":"任命","pinyin":"rènmìng","spanish":"designar / nombrar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":60,"chinese":"协调","pinyin":"xiétiáo","spanish":"coordinar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":61,"chinese":"配合","pinyin":"pèihé","spanish":"cooperar / colaborar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":62,"chinese":"支持","pinyin":"zhīchí","spanish":"apoyo; apoyar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":63,"chinese":"保障","pinyin":"bǎozhàng","spanish":"garantizar / salvaguardar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":64,"chinese":"核实","pinyin":"héshí","spanish":"verificar / constatar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":65,"chinese":"确认","pinyin":"quèrèn","spanish":"confirmar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":66,"chinese":"评估","pinyin":"pínggū","spanish":"evaluar / evaluación","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":67,"chinese":"加快","pinyin":"jiākuài","spanish":"acelerar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":68,"chinese":"降低","pinyin":"jiàngdī","spanish":"reducir / disminuir","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":69,"chinese":"启动","pinyin":"qǐdòng","spanish":"iniciar / poner en marcha","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":70,"chinese":"开工","pinyin":"kāigōng","spanish":"inicio de obras","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":71,"chinese":"正式开工","pinyin":"zhèngshì kāigōng","spanish":"inicio oficial de las obras","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":72,"chinese":"争取","pinyin":"zhēngqǔ","spanish":"gestionar / procurar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":73,"chinese":"优先","pinyin":"yōuxiān","spanish":"priorizar; prioritario","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":74,"chinese":"尽快","pinyin":"jǐnkuài","spanish":"lo antes posible","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":75,"chinese":"及时","pinyin":"jíshí","spanish":"oportuno / a tiempo","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":76,"chinese":"编制","pinyin":"biānzhì","spanish":"elaborar / preparar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":77,"chinese":"补充","pinyin":"bǔchōng","spanish":"complementar / aportar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":78,"chinese":"回复","pinyin":"huífù","spanish":"responder / contestar","part":"A","sectionCode":"A.3","sectionTitle":"Verbos de gestión y seguimiento"},{"id":79,"chinese":"数量","pinyin":"shùliàng","spanish":"cantidad","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":80,"chinese":"总量","pinyin":"zǒngliàng","spanish":"cantidad total","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":81,"chinese":"工程量","pinyin":"gōngchéngliàng","spanish":"volumen de obra","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":82,"chinese":"单位","pinyin":"dānwèi","spanish":"unidad","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":83,"chinese":"台","pinyin":"tái","spanish":"unidad (contador para máquinas)","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":84,"chinese":"件","pinyin":"jiàn","spanish":"pieza / unidad","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":85,"chinese":"块","pinyin":"kuài","spanish":"unidad (para parcelas / terrenos)","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":86,"chinese":"吨","pinyin":"dūn","spanish":"tonelada","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":87,"chinese":"米","pinyin":"mǐ","spanish":"metro","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":88,"chinese":"立方米","pinyin":"lìfāngmǐ","spanish":"metro cúbico (m³)","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":89,"chinese":"平方米","pinyin":"píngfāngmǐ","spanish":"metro cuadrado (m²)","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":90,"chinese":"毫米","pinyin":"háomǐ","spanish":"milímetro","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":91,"chinese":"加仑","pinyin":"jiālún","spanish":"galón","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":92,"chinese":"总重量","pinyin":"zǒng zhòngliàng","spanish":"peso total","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":93,"chinese":"平均","pinyin":"píngjūn","spanish":"promedio","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":94,"chinese":"比例","pinyin":"bǐlì","spanish":"proporción / porcentaje","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":95,"chinese":"序号","pinyin":"xùhào","spanish":"número de orden","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":96,"chinese":"项目","pinyin":"xiàngmù","spanish":"proyecto; partida","part":"A","sectionCode":"A.4","sectionTitle":"Cifras, unidades y datos"},{"id":97,"chinese":"土方","pinyin":"tǔfāng","spanish":"movimiento de tierras","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":98,"chinese":"挖方","pinyin":"wāfāng","spanish":"corte / excavación","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":99,"chinese":"填方","pinyin":"tiánfāng","spanish":"relleno","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":100,"chinese":"石方","pinyin":"shífāng","spanish":"excavación en roca","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":101,"chinese":"开挖","pinyin":"kāiwā","spanish":"excavación / desmonte","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":102,"chinese":"场坪","pinyin":"chǎngpíng","spanish":"preparación de plataforma","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":103,"chinese":"边坡","pinyin":"biānpō","spanish":"talud","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":104,"chinese":"修坡","pinyin":"xiūpō","spanish":"perfilado de taludes","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":105,"chinese":"护坡","pinyin":"hùpō","spanish":"protección de taludes","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":106,"chinese":"碾压","pinyin":"niǎnyā","spanish":"compactación","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":107,"chinese":"分层碾压","pinyin":"fēcéng niǎnyā","spanish":"compactación por capas","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":108,"chinese":"排土","pinyin":"páitǔ","spanish":"disposición de estériles","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":109,"chinese":"排土场","pinyin":"páitǔchǎng","spanish":"botadero de estériles (SWD)","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":110,"chinese":"废石场","pinyin":"fèishíchǎng","spanish":"botadero de roca estéril (WRF)","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":111,"chinese":"塌方","pinyin":"tāfāng","spanish":"derrumbe","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":112,"chinese":"清运","pinyin":"qīngyùn","spanish":"retiro / acarreo","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":113,"chinese":"转运","pinyin":"zhuǎnyùn","spanish":"transbordo / acarreo","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":114,"chinese":"物料","pinyin":"wùliào","spanish":"materiales / insumos","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":115,"chinese":"铺垫","pinyin":"pūdiàn","spanish":"capa de apoyo / asiento","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":116,"chinese":"混合料","pinyin":"hùnhéliào","spanish":"mezcla de materiales (roca-suelo)","part":"B","sectionCode":"B.1","sectionTitle":"Movimiento de tierras y excavaciones"},{"id":117,"chinese":"工程","pinyin":"gōngchéng","spanish":"obra / ingeniería","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":118,"chinese":"土建","pinyin":"tǔjiàn","spanish":"obra civil","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":119,"chinese":"施工","pinyin":"shīgōng","spanish":"construcción / ejecución de obra","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":120,"chinese":"混凝土","pinyin":"hùnníngtǔ","spanish":"hormigón / concreto","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":121,"chinese":"浇筑","pinyin":"jiāozhù","spanish":"vaciado / vertido de hormigón","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":122,"chinese":"衬砌","pinyin":"chènqì","spanish":"revestimiento","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":123,"chinese":"钢筋","pinyin":"gāngjīn","spanish":"acero de refuerzo","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":124,"chinese":"绑扎","pinyin":"bǎngzhā","spanish":"amarre de acero","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":125,"chinese":"钢结构","pinyin":"gāngjiégòu","spanish":"estructura metálica","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":126,"chinese":"模板","pinyin":"mùbǎn","spanish":"encofrado","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":127,"chinese":"脚手架","pinyin":"jiǎoshǒujià","spanish":"andamio","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":128,"chinese":"拆除","pinyin":"chāichú","spanish":"demolición / desmontaje","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":129,"chinese":"基础","pinyin":"jīchǔ","spanish":"cimentación / fundación","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":130,"chinese":"清基","pinyin":"qīngjī","spanish":"limpieza de cimentación","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":131,"chinese":"垫层","pinyin":"diàncéng","spanish":"capa de asiento (blinding)","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":132,"chinese":"框架","pinyin":"kuàngjià","spanish":"estructura / marco","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":133,"chinese":"基础梁","pinyin":"jīchǔliáng","spanish":"viga de cimentación","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":134,"chinese":"楼板","pinyin":"lóubǎn","spanish":"losa de piso","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":135,"chinese":"结构柱","pinyin":"jiégòu zhù","spanish":"columna estructural","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":136,"chinese":"廊道","pinyin":"lángdào","spanish":"galería","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":137,"chinese":"砌筑","pinyin":"qìzhù","spanish":"albañilería / mampostería","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":138,"chinese":"墙体","pinyin":"qiángtǔ","spanish":"muro","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":139,"chinese":"装修","pinyin":"zhuāngxiū","spanish":"acabados","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":140,"chinese":"安装","pinyin":"ānzhuāng","spanish":"montaje / instalación","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":141,"chinese":"主体工程","pinyin":"zhǔtǔ gōngchéng","spanish":"obra principal / estructura principal","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":142,"chinese":"结构","pinyin":"jiégòu","spanish":"estructura","part":"B","sectionCode":"B.2","sectionTitle":"Obras civiles, hormigón y estructuras"},{"id":143,"chinese":"道路","pinyin":"dàolù","spanish":"vía / camino","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":144,"chinese":"运输道路","pinyin":"yùnshū dàolù","spanish":"vía de acarreo (haul road)","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":145,"chinese":"场内道路","pinyin":"chǎngnèi dàolù","spanish":"caminos internos del sitio","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":146,"chinese":"施工便道","pinyin":"shīgōng biàndào","spanish":"camino provisional de obra","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":147,"chinese":"上山道路","pinyin":"shàngshān dàolù","spanish":"camino de subida al cerro","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":148,"chinese":"桥基","pinyin":"qiáojī","spanish":"cimentación de puente","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":149,"chinese":"下沉","pinyin":"xiàchén","spanish":"hundimiento / asentamiento","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":150,"chinese":"尾矿库","pinyin":"wěikuàngkù","spanish":"depósito de relaves (TSF)","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":151,"chinese":"初期坝","pinyin":"chūqībà","spanish":"presa de arranque (starter dam)","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":152,"chinese":"拦挡坝","pinyin":"lándǎngbà","spanish":"presa de contención","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":153,"chinese":"坝体","pinyin":"bàtǔ","spanish":"cuerpo de la presa","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":154,"chinese":"库区","pinyin":"kùqū","spanish":"vaso / área del depósito","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":155,"chinese":"沉淀池","pinyin":"chéndiànchí","spanish":"estanque de sedimentación","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":156,"chinese":"清淤","pinyin":"qīngyū","spanish":"descolmatación / limpieza de lodos","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":157,"chinese":"淤泥","pinyin":"yūní","spanish":"lodo / sedimento","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":158,"chinese":"截水沟","pinyin":"jiéshuǐgōu","spanish":"canal de desvío de aguas","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":159,"chinese":"排水沟","pinyin":"páishuǐgōu","spanish":"cuneta / drenaje","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":160,"chinese":"斜槽","pinyin":"xiécáo","spanish":"canaleta / chute","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":161,"chinese":"渗流水收集池","pinyin":"shènlìushuǐ shōujíchí","spanish":"estanque de aguas de infiltración","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":162,"chinese":"水处理站","pinyin":"shuǐ chǔlǐzhàn","spanish":"planta de tratamiento de agua (WTPF)","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":163,"chinese":"高位水池","pinyin":"gāowèi shuǐchí","spanish":"tanque / reservorio elevado","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":164,"chinese":"排水管","pinyin":"páishuǐguǎn","spanish":"tubería de drenaje","part":"B","sectionCode":"B.3","sectionTitle":"Vías, presas y obras hidráulicas"},{"id":165,"chinese":"永久","pinyin":"yǒngjiǔ","spanish":"permanente","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":166,"chinese":"临时","pinyin":"línshí","spanish":"temporal / provisional","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":167,"chinese":"永久营地","pinyin":"yǒngjiǔ yíngdì","spanish":"campamento permanente","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":168,"chinese":"车间","pinyin":"chējiān","spanish":"planta / nave industrial","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":169,"chinese":"破碎车间","pinyin":"pòsuì chējiān","spanish":"planta de trituración","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":170,"chinese":"磨浮车间","pinyin":"mófú chējiān","spanish":"planta de molienda y flotación","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":171,"chinese":"脱水车间","pinyin":"tuōshuǐ chējiān","spanish":"planta de deshidratación","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":172,"chinese":"粉矿仓","pinyin":"fěnkuàngcāng","spanish":"tolva de mineral fino","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":173,"chinese":"浓密机","pinyin":"nóngmìjī","spanish":"espesador","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":174,"chinese":"机修间","pinyin":"jīxiūjiān","spanish":"taller de mantenimiento","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":175,"chinese":"化验楼","pinyin":"huàyànlóu","spanish":"edificio de laboratorio","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":176,"chinese":"办公楼","pinyin":"bàngōnglóu","spanish":"edificio administrativo","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":177,"chinese":"仓库","pinyin":"cāngkù","spanish":"almacén / bodega","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":178,"chinese":"油库","pinyin":"yóukù","spanish":"patio de tanques de combustible","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":179,"chinese":"选厂","pinyin":"xuǎnchǎng","spanish":"planta de proceso (concentradora)","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":180,"chinese":"总图","pinyin":"zǒngtú","spanish":"plano general del sitio","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":181,"chinese":"围墙","pinyin":"wéiqiáng","spanish":"muro perimetral","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":182,"chinese":"检查井","pinyin":"jiǎnchájǐng","spanish":"pozo de inspección","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":183,"chinese":"路灯","pinyin":"lùdēng","spanish":"alumbrado / luminarias","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":184,"chinese":"场地","pinyin":"chǎngdì","spanish":"terreno / patio","part":"B","sectionCode":"B.4","sectionTitle":"Edificaciones e instalaciones de planta"},{"id":185,"chinese":"设备","pinyin":"shèbèi","spanish":"equipo","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":186,"chinese":"挖掘机","pinyin":"wājuéjī","spanish":"excavadora","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":187,"chinese":"自卸车","pinyin":"zìxièchē","spanish":"volquete / camión de volteo","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":188,"chinese":"推土机","pinyin":"tuītǔjī","spanish":"topadora / bulldozer","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":189,"chinese":"装载机","pinyin":"zhuāngzàijī","spanish":"cargadora frontal","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":190,"chinese":"平地机","pinyin":"píngdìjī","spanish":"motoniveladora","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":191,"chinese":"压路机","pinyin":"yālùjī","spanish":"rodillo / compactadora","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":192,"chinese":"叉车","pinyin":"chāchē","spanish":"montacargas","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":193,"chinese":"加油车","pinyin":"jiāyóuchē","spanish":"camión cisterna de combustible","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":194,"chinese":"潜孔钻机","pinyin":"qiánkǒng zuànjī","spanish":"perforadora de hoyo descendente (DTH)","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":195,"chinese":"随车吊","pinyin":"suíchēdiào","spanish":"grúa montada sobre camión","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":196,"chinese":"起重机","pinyin":"qǐzhòngjī","spanish":"grúa","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":197,"chinese":"泵车","pinyin":"bèngchē","spanish":"bomba de hormigón (camión bomba)","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":198,"chinese":"柴油发电机","pinyin":"cháiyóu fādiànjī","spanish":"generador diésel","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":199,"chinese":"中巴车","pinyin":"zhōngbāchē","spanish":"minibús","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":200,"chinese":"皮卡车","pinyin":"píkǎchē","spanish":"camioneta","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":201,"chinese":"爆炸物运输车","pinyin":"bàozhàwù yùnshūchē","spanish":"camión de transporte de explosivos","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":202,"chinese":"出勤率","pinyin":"chūqínlǜ","spanish":"tasa de asistencia (equipos)","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":203,"chinese":"租赁","pinyin":"zūlìn","spanish":"alquiler","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":204,"chinese":"借调","pinyin":"jièdiào","spanish":"préstamo / cesión de equipos","part":"B","sectionCode":"B.5","sectionTitle":"Equipos y maquinaria de obra"},{"id":205,"chinese":"破碎","pinyin":"pòsuì","spanish":"trituración","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":206,"chinese":"颚式破碎机","pinyin":"èshì pòsuìjī","spanish":"trituradora de mandíbula","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":207,"chinese":"立磨","pinyin":"lìmó","spanish":"molino vertical","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":208,"chinese":"球磨机","pinyin":"qiúmòjī","spanish":"molino de bolas","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":209,"chinese":"半自磨机","pinyin":"bànzìmòjī","spanish":"molino semiautógeno (SAG)","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":210,"chinese":"浮选","pinyin":"fúxuǎn","spanish":"flotación","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":211,"chinese":"浮选机","pinyin":"fúxuǎnjī","spanish":"celda de flotación","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":212,"chinese":"浮选柱","pinyin":"fúxuǎnzhù","spanish":"columna de flotación","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":213,"chinese":"压滤机","pinyin":"yālǜjī","spanish":"prensa de filtros","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":214,"chinese":"旋流器","pinyin":"xuánliúqì","spanish":"hidrociclón","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":215,"chinese":"振动筛","pinyin":"zhèndòngshāi","spanish":"zaranda vibratoria","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":216,"chinese":"搅拌槽","pinyin":"jiǎobàncáo","spanish":"tanque agitador","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":217,"chinese":"空压机","pinyin":"kōngyājī","spanish":"compresor de aire","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":218,"chinese":"给料机","pinyin":"gěiliàojī","spanish":"alimentador","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":219,"chinese":"尾矿浓密机","pinyin":"wěikuàng nóngmìjī","spanish":"espesador de relaves","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":220,"chinese":"汽车衡","pinyin":"qìchēhéng","spanish":"báscula para camiones","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":221,"chinese":"备件","pinyin":"bèijiàn","spanish":"repuestos / piezas de repuesto","part":"B","sectionCode":"B.6","sectionTitle":"Equipos de la planta de proceso"},{"id":222,"chinese":"材料","pinyin":"cáiliào","spanish":"material","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":223,"chinese":"水泥","pinyin":"shuǐní","spanish":"cemento","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":224,"chinese":"砂石","pinyin":"shāshí","spanish":"arena y grava","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":225,"chinese":"石料","pinyin":"shíliào","spanish":"árido / material rocoso","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":226,"chinese":"块石","pinyin":"kuàishí","spanish":"roca en bloques","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":227,"chinese":"合格石料","pinyin":"hégé shíliào","spanish":"roca apta / conforme","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":228,"chinese":"减水剂","pinyin":"jiǎnshuǐjì","spanish":"aditivo reductor de agua","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":229,"chinese":"土工布","pinyin":"tǔgōngbù","spanish":"geotextil","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":230,"chinese":"柴油","pinyin":"cháiyóu","spanish":"diésel","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":231,"chinese":"安山岩","pinyin":"ānshānyán","spanish":"andesita","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":232,"chinese":"风化土","pinyin":"fēnghuàtǔ","spanish":"suelo meteorizado","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":233,"chinese":"腐泥岩","pinyin":"fǔníyán","spanish":"saprolita","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":234,"chinese":"开采","pinyin":"kāicǎi","spanish":"extracción / explotación","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":235,"chinese":"供应","pinyin":"gōngyìng","spanish":"suministro / abastecimiento","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":236,"chinese":"不足","pinyin":"búzú","spanish":"insuficiencia / déficit","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":237,"chinese":"需求","pinyin":"xūqiú","spanish":"demanda / requerimiento","part":"B","sectionCode":"B.7","sectionTitle":"Materiales, áridos y geología"},{"id":238,"chinese":"天气","pinyin":"tiānqì","spanish":"clima / tiempo","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":239,"chinese":"降雨","pinyin":"jiàngyǔ","spanish":"lluvia","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":240,"chinese":"降雨量","pinyin":"jiàngyǔliàng","spanish":"precipitación","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":241,"chinese":"极端降雨","pinyin":"jíduān jiàngyǔ","spanish":"lluvia extrema","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":242,"chinese":"雾雨","pinyin":"wùyǔ","spanish":"llovizna / neblina lluviosa","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":243,"chinese":"厄尔尼诺","pinyin":"È'ěrnínuò","spanish":"El Niño (fenómeno climático)","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":244,"chinese":"异常","pinyin":"yìcháng","spanish":"anormal / inusual","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":245,"chinese":"水管理","pinyin":"shuǐ guǎnlǐ","spanish":"gestión hídrica","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":246,"chinese":"含水率","pinyin":"hánshuǐlǜ","spanish":"contenido de humedad","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":247,"chinese":"水土流失","pinyin":"shuǐtǔ liúshī","spanish":"erosión del suelo","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":248,"chinese":"松软","pinyin":"sōngruǎn","spanish":"blando / ablandado","part":"B","sectionCode":"B.8","sectionTitle":"Clima, agua y condiciones del sitio"},{"id":249,"chinese":"稳定性","pinyin":"wěndìngxìng","spanish":"estabilidad","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":250,"chinese":"承载力","pinyin":"chéngzàilì","spanish":"capacidad portante","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":251,"chinese":"标高","pinyin":"biāogāo","spanish":"cota / elevación (n.i.m.)","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":252,"chinese":"平台","pinyin":"píngtái","spanish":"plataforma","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":253,"chinese":"监测","pinyin":"jiāncè","spanish":"monitoreo","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":254,"chinese":"位移监测点","pinyin":"wèiyí jiāncèdiǎn","spanish":"punto de monitoreo de desplazamiento","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":255,"chinese":"堆载","pinyin":"duīzài","spanish":"sobrecarga (material apilado)","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":256,"chinese":"河堤","pinyin":"hédī","spanish":"ribera / dique fluvial","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":257,"chinese":"漫堤","pinyin":"màndī","spanish":"desbordamiento del río","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":258,"chinese":"次生灾害","pinyin":"cìshēng zāihài","spanish":"riesgos secundarios","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":259,"chinese":"受影响区域","pinyin":"shòu yǐngxiǎng qūyù","spanish":"área afectada","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":260,"chinese":"损坏","pinyin":"sǔnhuài","spanish":"daño / deterioro","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":261,"chinese":"抢修","pinyin":"qiǎngxiū","spanish":"reparación de emergencia","part":"B","sectionCode":"B.9","sectionTitle":"Estabilidad, monitoreo y contingencias"},{"id":262,"chinese":"外部供电","pinyin":"wàibù gōngdiàn","spanish":"suministro eléctrico externo","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":263,"chinese":"变电站","pinyin":"biàndiànzhàn","spanish":"subestación","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":264,"chinese":"电网","pinyin":"diànwǎng","spanish":"red eléctrica","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":265,"chinese":"线路","pinyin":"xiànlù","spanish":"línea (eléctrica)","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":266,"chinese":"供电","pinyin":"gōngdiàn","spanish":"suministro de energía","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":267,"chinese":"限电","pinyin":"xiàndiàn","spanish":"restricción de energía eléctrica","part":"B","sectionCode":"B.10","sectionTitle":"Energía eléctrica"},{"id":268,"chinese":"许可","pinyin":"xǔkě","spanish":"permiso","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":269,"chinese":"许可证","pinyin":"xǔkězhèng","spanish":"licencia / permiso","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":270,"chinese":"运营许可","pinyin":"yùnyíng xǔkě","spanish":"permiso de operación","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":271,"chinese":"炸药库","pinyin":"zhàyàokù","spanish":"polvorín / depósito de explosivos","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":272,"chinese":"消防","pinyin":"xiāofáng","spanish":"protección contra incendios / bomberos","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":273,"chinese":"消防部门","pinyin":"xiāofáng bùmén","spanish":"cuerpo de bomberos","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":274,"chinese":"技术检查","pinyin":"jìshù jiǎnchá","spanish":"inspección técnica","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":275,"chinese":"合格报告","pinyin":"hégé bàogào","spanish":"informe de conformidad","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":276,"chinese":"图纸","pinyin":"túzhǐ","spanish":"planos / dibujos técnicos","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":277,"chinese":"技术规格","pinyin":"jìshù guīgé","spanish":"especificaciones técnicas","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":278,"chinese":"适用性证明","pinyin":"shìyòngxìng zhèngmíng","spanish":"certificado de ocupación / habitabilidad","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":279,"chinese":"行政决议","pinyin":"xíngzhèng juéyì","spanish":"resolución administrativa","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":280,"chinese":"环境登记","pinyin":"huánjìng dēngjì","spanish":"registro ambiental","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":281,"chinese":"环境管理计划","pinyin":"huánjìng guǎnlǐ jì huà","spanish":"plan de manejo ambiental (PMA)","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":282,"chinese":"提级审批","pinyin":"tíjí shěnpī","spanish":"asunción de competencia (trámite elevado)","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":283,"chinese":"主管部门","pinyin":"zhǔguǎn bùmén","spanish":"autoridad competente","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":284,"chinese":"地役权","pinyin":"dìyìquán","spanish":"servidumbre de paso","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":285,"chinese":"征地","pinyin":"zhēngdì","spanish":"adquisición de tierras","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":286,"chinese":"地块","pinyin":"dìkuài","spanish":"predio / parcela","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":287,"chinese":"地主","pinyin":"dìzhǔ","spanish":"propietario del terreno","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":288,"chinese":"地籍资料","pinyin":"dìjí zīliào","spanish":"registros catastrales","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":289,"chinese":"产权变更","pinyin":"chǎnquán biàngèng","spanish":"cambio de propiedad","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":290,"chinese":"费用","pinyin":"fèiyòng","spanish":"tasas / aranceles","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":291,"chinese":"缴纳","pinyin":"jiǎonà","spanish":"pagar (tasas)","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":292,"chinese":"立项","pinyin":"lìxiàng","spanish":"aprobación de inicio del proyecto","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":293,"chinese":"招标","pinyin":"zhāobiāo","spanish":"licitación","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":294,"chinese":"合规","pinyin":"héguī","spanish":"cumplimiento normativo","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":295,"chinese":"环境","pinyin":"huánjìng","spanish":"medio ambiente","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":296,"chinese":"考古","pinyin":"kǎogǔ","spanish":"arqueología","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":297,"chinese":"安全","pinyin":"ānquán","spanish":"seguridad","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":298,"chinese":"法律","pinyin":"fǎlǜ","spanish":"legal / jurídico","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":299,"chinese":"监理","pinyin":"jiānlǐ","spanish":"supervisión (consultor)","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":300,"chinese":"合同","pinyin":"hétóng","spanish":"contrato","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":301,"chinese":"在线审批系统","pinyin":"zàixiàn shěnpī xìtǒng","spanish":"sistema de aprobación en línea","part":"B","sectionCode":"B.11","sectionTitle":"Permisos, legal y ambiental"},{"id":302,"chinese":"社会责任","pinyin":"shèhuì zérèn","spanish":"responsabilidad social","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":303,"chinese":"社区","pinyin":"shèqū","spanish":"comunidad","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":304,"chinese":"冲突管理","pinyin":"chōngtū guǎnlǐ","spanish":"gestión de conflictos","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":305,"chinese":"业主","pinyin":"yèzhǔ","spanish":"propietario / titular","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":306,"chinese":"关切","pinyin":"guānqiè","spanish":"preocupación","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":307,"chinese":"溪流","pinyin":"xīliú","spanish":"quebrada / arroyo","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":308,"chinese":"水质","pinyin":"shuǐzhì","spanish":"calidad del agua","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":309,"chinese":"浑浊","pinyin":"húnzhuó","spanish":"turbiedad","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":310,"chinese":"牲畜","pinyin":"shēngchù","spanish":"ganado","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":311,"chinese":"水样","pinyin":"shuǐyàng","spanish":"muestra de agua","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":312,"chinese":"技术评估","pinyin":"jìshù pínggū","spanish":"evaluación técnica","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":313,"chinese":"土地","pinyin":"tǔdì","spanish":"terreno / tierra","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":314,"chinese":"洪灾","pinyin":"hóngzāi","spanish":"inundación / crecida","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":315,"chinese":"应急响应","pinyin":"yìngjí xiǎngyìng","spanish":"respuesta de emergencia","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":316,"chinese":"紧急状态","pinyin":"jǐnjí zhuàngtài","spanish":"estado de emergencia","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":317,"chinese":"委员会","pinyin":"wěiyuánhuì","spanish":"comité","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":318,"chinese":"救援","pinyin":"jiùyuán","spanish":"rescate / auxilio","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":319,"chinese":"清障","pinyin":"qīngzhàng","spanish":"remoción de escombros","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":320,"chinese":"抢通","pinyin":"qiǎngtōng","spanish":"reapertura (de vías)","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":321,"chinese":"基础设施","pinyin":"jīchǔ shèshī","spanish":"infraestructura","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":322,"chinese":"受损","pinyin":"shòusǔn","spanish":"dañado / afectado","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":323,"chinese":"机构信任","pinyin":"jīgòu xìnrèn","spanish":"confianza institucional","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":324,"chinese":"社会许可","pinyin":"shèhuì xǔkě","spanish":"licencia social","part":"B","sectionCode":"B.12","sectionTitle":"Comunidad, responsabilidad social y emergencias"},{"id":325,"chinese":"人力资源","pinyin":"rénlì zīyuán","spanish":"recursos humanos","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":326,"chinese":"人员","pinyin":"rényuán","spanish":"personal","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":327,"chinese":"员工","pinyin":"yuángōng","spanish":"colaboradores / empleados","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":328,"chinese":"工人","pinyin":"gōngrén","spanish":"obreros / trabajadores","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":329,"chinese":"管理人员","pinyin":"guǎnlǐ rényuán","spanish":"personal de supervisión / gestión","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":330,"chinese":"本地员工","pinyin":"běndì yuángōng","spanish":"personal local","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":331,"chinese":"机械操作手","pinyin":"jīxiè cāozuòshǒu","spanish":"operador de maquinaria","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":332,"chinese":"员工人数","pinyin":"yuángōng rénshù","spanish":"dotación de personal (headcount)","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":333,"chinese":"员工离职","pinyin":"yuángōng lízhí","spanish":"retiro / salida de personal","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":334,"chinese":"招聘与选拔","pinyin":"zhāopìn yǔ xuǎnbá","spanish":"reclutamiento y selección","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":335,"chinese":"轮换","pinyin":"lúnhuàn","spanish":"rotación (de personal)","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":336,"chinese":"职务","pinyin":"zhíwù","spanish":"cargo / puesto","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":337,"chinese":"负责人","pinyin":"fúzérén","spanish":"responsable / encargado","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":338,"chinese":"部门","pinyin":"bùmén","spanish":"departamento / área","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":339,"chinese":"假期","pinyin":"jiàqī","spanish":"vacaciones","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":340,"chinese":"工作日","pinyin":"gōngzuòrì","spanish":"día laborable","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":341,"chinese":"休息日","pinyin":"xiūxīrì","spanish":"día de descanso","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":342,"chinese":"节假日补偿","pinyin":"jiéjiàrì bǔcháng","spanish":"compensación de feriados","part":"B","sectionCode":"B.13","sectionTitle":"Personal y organización"},{"id":343,"chinese":"设备发运","pinyin":"shèbèi fāyùn","spanish":"embarque de equipos","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":344,"chinese":"发运","pinyin":"fāyùn","spanish":"embarque / despacho","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":345,"chinese":"散货","pinyin":"sànhuò","spanish":"carga suelta (breakbulk)","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":346,"chinese":"集装箱","pinyin":"jízhuāngxiāng","spanish":"contenedor","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":347,"chinese":"发船时间","pinyin":"fāchuán shíjiān","spanish":"fecha de zarpe","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":348,"chinese":"到港时间","pinyin":"dàogǎng shíjiān","spanish":"fecha de llegada a puerto","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":349,"chinese":"抵港","pinyin":"dǐgǎng","spanish":"arribar al puerto","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":350,"chinese":"清关","pinyin":"qīngguān","spanish":"despacho aduanero / nacionalización","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":351,"chinese":"卸货","pinyin":"xièhuò","spanish":"descarga","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":352,"chinese":"海运途中","pinyin":"hǎiyùn túzhōng","spanish":"en tránsito marítimo","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":353,"chinese":"进口","pinyin":"jìnkǒu","spanish":"importación","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":354,"chinese":"进场","pinyin":"jìnchǎng","spanish":"ingreso al sitio / movilización","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":355,"chinese":"进场材料","pinyin":"jìnchǎng cáiliào","spanish":"materiales ingresados a obra","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":356,"chinese":"到货","pinyin":"dàohuò","spanish":"llegada de mercancía","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":357,"chinese":"存放场地","pinyin":"cúnfàng chǎngdì","spanish":"área de almacenamiento","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":358,"chinese":"采购","pinyin":"cǎigòu","spanish":"adquisiciones / compras","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":359,"chinese":"现场","pinyin":"xiànchǎng","spanish":"sitio / en obra","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":360,"chinese":"工作面","pinyin":"gōngzuòmiàn","spanish":"frente de trabajo","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":361,"chinese":"作业面","pinyin":"zuòyèmiàn","spanish":"superficie / frente de trabajo","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":362,"chinese":"重型车辆","pinyin":"zhòngxíng chēliàng","spanish":"vehículos pesados","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":363,"chinese":"通行","pinyin":"tōngxíng","spanish":"tránsito / acceso","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"},{"id":364,"chinese":"恶化","pinyin":"èhuà","spanish":"deterioro / empeoramiento","part":"B","sectionCode":"B.14","sectionTitle":"Logística, importación y frentes de trabajo"}];
+   222→
+   223→/* ---------- estado y progreso ---------- */
+   224→const KEY = "el-domo-vocab-v1";
+   225→let VOCAB = [];
+   226→const S = {
+   227→  part:"all", section:"all",
+   228→  learned:new Set(), quizBest:0, custom:[], newPart:"B",
+   229→  fcOrder:[], fcPos:0, flipped:false,
+   230→  quiz:null, match:null,
+   231→  query:"", shown:50
+   232→};
+   233→function load(){ try{ const d=JSON.parse(localStorage.getItem(KEY)||"{}");
+   234→  (d.learned||[]).forEach(i=>S.learned.add(i)); S.quizBest=d.quizBest||0; S.custom=Array.isArray(d.custom)?d.custom:[]; }catch(e){} }
+   235→function save(){ try{ localStorage.setItem(KEY,JSON.stringify({learned:[...S.learned],quizBest:S.quizBest,custom:S.custom})); }catch(e){} }
+   236→
+   237→/* ---------- utilidades ---------- */
+   238→const $ = s=>document.querySelector(s);
+   239→const esc = t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+   240→function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+   241→function norm(t){ return t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
+   242→function speak(t){ try{ if(!("speechSynthesis" in window))return;
+   243→  const u=new SpeechSynthesisUtterance(t); u.lang="zh-CN"; u.rate=.8;
+   244→  speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
+   245→
+   246→/* ---------- filtros / mazo ---------- */
+   247→function deck(){ return VOCAB.filter(w=>(S.part==="all"||w.part===S.part)&&(S.section==="all"||w.sectionCode===S.section)); }
+   248→function refreshDeck(){
+   249→  const d=deck(); $("#deckN").textContent=d.length;
+   250→  S.fcOrder=d.map(w=>w.id); S.fcPos=0; S.flipped=false; S.shown=50;
+   251→  renderFc(); renderList();
+   252→}
+   253→
+   254→/* ---------- estadísticas ---------- */
+   255→function stats(){
+   256→  $("#stTotal").textContent=VOCAB.length;
+   257→  $("#stLearned").textContent=S.learned.size;
+   258→  const p=Math.round(S.learned.size/VOCAB.length*100);
+   259→  $("#stPct").textContent=p+"%"; $("#gfill").style.width=p+"%";
+   260→}
+   261→
+   262→/* ---------- FLASHCARDS ---------- */
+   263→function wById(id){ return VOCAB.find(w=>w.id===id); }
+   264→function renderFc(){
+   265→  const d=S.fcOrder;
+   266→  if(!d.length){ $("#fcBox").innerHTML='<div class="empty">El mazo filtrado no tiene palabras.<br>Prueba otros filtros.</div>'; return; }
+   267→  if(S.fcPos>=d.length) S.fcPos=d.length-1;
+   268→  const w=wById(d[S.fcPos]), learned=S.learned.has(w.id);
+   269→  $("#fcBox").innerHTML=
+   270→    '<div class="flip'+(S.flipped?" fl":"")+'" id="fcCard" title="Clic para voltear">'+
+   271→      '<div class="flipin">'+
+   272→        '<div class="face front">'+
+   273→          '<span class="badge">'+esc(w.sectionCode)+' · '+esc(w.sectionTitle)+'</span>'+
+   274→          '<button class="secbtn" id="fcAudio" title="Pronunciar">🔊</button>'+
+   275→          '<div class="hanzi cjk">'+esc(w.chinese)+'</div>'+
+   276→          (learned?'<div class="lmark">✓ aprendida</div>':"")+
+   277→        '</div>'+
+   278→        '<div class="face back">'+
+   279→          '<div class="pinyin">'+esc(w.pinyin)+'</div>'+
+   280→          '<div class="esptxt">'+esc(w.spanish)+'</div>'+
+   281→        '</div>'+
+   282→      '</div>'+
+   283→    '</div>'+
+   284→    '<div class="fcrow">'+
+   285→      '<button class="btn ghost" id="fcPrev">◀ Anterior</button>'+
+   286→      '<button class="btn warn" id="fcShuf">Barajar 🔀</button>'+
+   287→      '<button class="btn ghost" id="fcNext">Siguiente ▶</button>'+
+   288→    '</div>'+
+   289→    '<div class="fcrow">'+
+   290→      '<button class="btn bad" id="fcNo">No la sé 🔁</button>'+
+   291→      '<button class="btn good" id="fcYes">¡La sé! ✅</button>'+
+   292→    '</div>'+
+   293→    '<div class="fmeta"><span>Tarjeta '+(S.fcPos+1)+' de '+d.length+'</span>'+
+   294→      '<div class="mbar"><div class="mfill" style="width:'+((S.fcPos+1)/d.length*100)+'%"></div></div></div>';
+   295→  $("#fcCard").onclick=e=>{ if(e.target.id==="fcAudio")return; S.flipped=!S.flipped; renderFc(); };
+   296→  $("#fcAudio").onclick=()=>speak(w.chinese);
+   297→  $("#fcPrev").onclick=()=>{ S.fcPos=(S.fcPos-1+d.length)%d.length; S.flipped=false; renderFc(); };
+   298→  $("#fcNext").onclick=()=>{ S.fcPos=(S.fcPos+1)%d.length; S.flipped=false; renderFc(); };
+   299→  $("#fcShuf").onclick=()=>{ S.fcOrder=shuffle(S.fcOrder); S.fcPos=0; S.flipped=false; renderFc(); };
+   300→  $("#fcYes").onclick=()=>{ S.learned.add(w.id); save(); stats(); S.fcPos=(S.fcPos+1)%d.length; S.flipped=false; renderFc(); };
+   301→  $("#fcNo").onclick=()=>{ S.learned.delete(w.id); save(); stats(); S.fcPos=(S.fcPos+1)%d.length; S.flipped=false; renderFc(); };
+   302→}
+   303→
+   304→/* ---------- QUIZ ---------- */
+   305→function newQuiz(){
+   306→  const d=deck();
+   307→  if(d.length<4){ $("#qzBox").innerHTML='<div class="empty">Necesitas al menos 4 palabras en el mazo filtrado para jugar.<br>Amplía los filtros.</div>'; return; }
+   308→  const n=Math.min(10,d.length), qs=[];
+   309→  const pool=shuffle(d).slice(0,n);
+   310→  for(const w of pool){
+   311→    const dir=Math.random()<.5?"zh":"es";
+   312→    const opts=new Set([dir==="zh"?w.spanish:w.chinese]);
+   313→    while(opts.size<4){
+   314→      const r=VOCAB[Math.floor(Math.random()*VOCAB.length)];
+   315→      const v=dir==="zh"?r.spanish:r.chinese;
+   316→      if(!opts.has(v)) opts.add(v);
+   317→    }
+   318→    const arr=shuffle([...opts]);
+   319→    qs.push({w,dir,opts:arr,ans:arr.indexOf(dir==="zh"?w.spanish:w.chinese),picked:null});
+   320→  }
+   321→  S.quiz={qs,i:0,score:0}; renderQuiz();
+   322→}
+   323→function renderQuiz(){
+   324→  const q=S.quiz;
+   325→  if(q.i>=q.qs.length){
+   326→    const s=q.score, msg=s>=9?"¡Impecable! 🎉":s>=7?"¡Muy bien! Sigue así 💪":s>=5?"Buen avance, repite para consolidar 📖":"Repasa con las flashcards y vuelve 🔄";
+   327→    if(s>S.quizBest){ S.quizBest=s; save(); }
+   328→    $("#qzBox").innerHTML='<div class="final"><div style="font-size:15px;color:var(--muted)">Resultado de la ronda</div>'+
+   329→      '<div class="score">'+s+' / '+q.qs.length+'</div><div style="margin:8px 0 4px">'+msg+'</div>'+
+   330→      '<div style="font-size:13px;color:var(--muted);margin-bottom:16px">Mejor puntaje: '+S.quizBest+' / '+q.qs.length+'</div>'+
+   331→      '<div class="fcrow"><button class="btn" id="qzAgain">Repetir 🔄</button><button class="btn ghost" id="qzNew">Nuevo mazo 🔀</button></div></div>';
+   332→    $("#qzAgain").onclick=newQuiz; $("#qzNew").onclick=newQuiz; return;
+   333→  }
+   334→  const cur=q.qs[q.i], zh=cur.dir==="zh";
+   335→  $("#qzBox").innerHTML='<div class="qq">'+
+   336→    '<div class="qtag">Pregunta '+(q.i+1)+' de '+q.qs.length+(zh?" · ¿Qué significa?":" · ¿Cómo se dice en chino?")+'</div>'+
+   337→    '<div class="qword'+(zh?" cjk":" lat")+'">'+esc(zh?cur.w.chinese:cur.w.spanish)+'</div>'+
+   338→    (zh?"":'<div style="font-size:12.5px;color:var(--muted)">elige el 汉字 correcto</div>')+
+   339→    '<div class="qopts">'+cur.opts.map((o,i)=>
+   340→      '<button class="opt'+(zh?"":" cjk")+'" data-i="'+i+'">'+esc(o)+'</button>').join("")+'</div>'+
+   341→    '<div class="qfoot"><span>Aciertos: '+q.score+'</span><span>Mejor: '+S.quizBest+'</span></div></div>';
+   342→  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+   343→    const i=+b.dataset.i;
+   344→    document.querySelectorAll(".opt").forEach(x=>{ x.disabled=true;
+   345→      if(+x.dataset.i===cur.ans)x.classList.add("ok"); });
+   346→    if(i===cur.ans) q.score++; else b.classList.add("ko");
+   347→    cur.picked=i; stats();
+   348→    const nb=document.createElement("button"); nb.className="btn"; nb.textContent="Siguiente ▶"; nb.style.marginTop="14px";
+   349→    nb.onclick=()=>{ q.i++; renderQuiz(); };
+   350→    document.querySelector(".qfoot").after(nb);
+   351→  });
+   352→}
+   353→
+   354→/* ---------- EMPAREJAR ---------- */
+   355→function newMatch(){
+   356→  const d=deck();
+   357→  if(d.length<3){ $("#mtBox").innerHTML='<div class="empty">Necesitas al menos 3 palabras en el mazo filtrado para jugar.</div>'; return; }
+   358→  const pick=shuffle(d).slice(0,5);
+   359→  if(S.match&&S.match.timer)clearInterval(S.match.timer);
+   360→  S.match={pairs:pick, selL:null, selR:null, done:0, t0:null, timer:null};
+   361→  renderMatch();
+   362→}
+   363→function renderMatch(){
+   364→  const m=S.match;
+   365→  const L=shuffle(m.pairs), R=shuffle(m.pairs);
+   366→  $("#mtBox").innerHTML='<div class="mhead"><span>Empareja 汉字 con su significado</span><span>⏱ <span class="mtimer" id="mtT">0.0 s</span></span></div>'+
+   367→    '<div class="mrow"><div>'+L.map(w=>'<button class="mcell zh cjk" data-l="'+w.id+'">'+esc(w.chinese)+'</button>').join("")+'</div>'+
+   368→    '<div>'+R.map(w=>'<button class="mcell" data-r="'+w.id+'">'+esc(w.spanish)+'</button>').join("")+'</div></div>';
+   369→  m.timer=setInterval(()=>{ if(m.t0)document.getElementById("mtT").textContent=((Date.now()-m.t0)/1000).toFixed(1)+" s"; },100);
+   370→  document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
+   371→    if(b.classList.contains("ok"))return;
+   372→    document.querySelectorAll("[data-l]").forEach(x=>x.classList.remove("sel"));
+   373→    b.classList.add("sel"); m.selL=+b.dataset.l; if(!m.t0)m.t0=Date.now(); speak(wById(m.selL).chinese); tryMatch();
+   374→  });
+   375→  document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{
+   376→    if(b.classList.contains("ok"))return;
+   377→    document.querySelectorAll("[data-r]").forEach(x=>x.classList.remove("sel"));
+   378→    b.classList.add("sel"); m.selR=+b.dataset.r; if(!m.t0)m.t0=Date.now(); tryMatch();
+   379→  });
+   380→  function tryMatch(){
+   381→    if(m.selL&&m.selR){
+   382→      const lb=document.querySelector('[data-l="'+m.selL+'"]'), rb=document.querySelector('[data-r="'+m.selR+'"]');
+   383→      if(m.selL===m.selR){
+   384→        lb.classList.remove("sel"); rb.classList.remove("sel");
+   385→        lb.classList.add("ok"); rb.classList.add("ok"); m.done++;
+   386→        if(m.done===m.pairs.length){
+   387→          clearInterval(m.timer);
+   388→          const t=((Date.now()-m.t0)/1000).toFixed(1);
+   389→          setTimeout(()=>{ document.getElementById("mtBox").insertAdjacentHTML("beforeend",
+   390→            '<div class="final" style="margin-top:20px"><div style="font-size:15px;color:var(--muted)">¡Ronda completa! 🎉</div>'+
+   391→            '<div class="score" style="font-size:38px">'+t+' s</div>'+
+   392→            '<div class="fcrow"><button class="btn" id="mtNew">Nueva ronda 🔀</button></div></div>');
+   393→            document.getElementById("mtNew").onclick=newMatch; },350);
+   394→        }
+   395→      }else{
+   396→        lb.classList.add("bad"); rb.classList.add("bad");
+   397→        setTimeout(()=>{ lb.classList.remove("bad","sel"); rb.classList.remove("bad","sel"); },450);
+   398→      }
+   399→      m.selL=null; m.selR=null;
+   400→    }
+   401→  }
+   402→}
+   403→
+   404→/* ---------- LISTA ---------- */
+   405→function filteredList(){
+   406→  const q=norm(S.query.trim());
+   407→  return deck().filter(w=>!q||norm(w.chinese).includes(q)||norm(w.pinyin).includes(q)||norm(w.spanish).includes(q));
+   408→}
+   409→function renderList(){
+   410→  const items=filteredList(), shown=items.slice(0,S.shown);
+   411→  if(!items.length){ document.getElementById("listBox").innerHTML='<div class="empty">Sin resultados para tu búsqueda.</div>'; document.getElementById("moreBtn").style.display="none"; return; }
+   412→  document.getElementById("listBox").innerHTML=shown.map(w=>{
+   413→    const le=S.learned.has(w.id);
+   414→    return '<div class="vrow"><span class="zh cjk">'+esc(w.chinese)+'</span>'+
+   415→      '<span class="py">'+esc(w.pinyin)+'</span><span class="sp">'+esc(w.spanish)+'</span>'+
+   416→      '<span class="tag">'+esc(w.sectionCode)+'</span>'+
+   417→      '<button class="mini" data-au="'+w.id+'" title="Pronunciar">🔊</button>'+
+   418→      '<button class="mini'+(le?" learned":"")+'" data-lr="'+w.id+'" title="Marcar como aprendida">'+(le?"✓":"○")+'</button></div>';
+   419→  }).join("");
+   420→  const mb=document.getElementById("moreBtn");
+   421→  mb.style.display=items.length>shown.length?"block":"none";
+   422→  mb.textContent="Mostrar más ▼ ("+(items.length-shown.length)+" restantes)";
+   423→  document.querySelectorAll("[data-au]").forEach(b=>b.onclick=()=>speak(wById(+b.dataset.au).chinese));
+   424→  document.querySelectorAll("[data-lr]").forEach(b=>b.onclick=()=>{
+   425→    const id=+b.dataset.lr;
+   426→    if(S.learned.has(id))S.learned.delete(id); else S.learned.add(id);
+   427→    save(); stats(); renderList();
+   428→  });
+   429→}
+   430→document.getElementById("qInput").oninput=e=>{ S.query=e.target.value; S.shown=50; renderList(); };
+   431→document.getElementById("moreBtn").onclick=()=>{ S.shown+=50; renderList(); };
+   432→
+   433→/* ---------- eventos globales ---------- */
+   434→document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{
+   435→  document.querySelectorAll("[data-part]").forEach(x=>x.classList.remove("on"));
+   436→  b.classList.add("on"); S.part=b.dataset.part; S.section="all"; document.getElementById("secSel").value="all"; refreshDeck();
+   437→});
+   438→document.getElementById("secSel").onchange=e=>{
+   439→  S.section=e.target.value;
+   440→  if(S.section!=="all"){ const w=VOCAB.find(v=>v.sectionCode===S.section); S.part=w?w.part:"all";
+   441→    document.querySelectorAll("[data-part]").forEach(x=>x.classList.toggle("on",x.dataset.part===S.part)); }
+   442→  refreshDeck();
+   443→};
+   444→document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+   445→  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+   446→  t.classList.add("on");
+   447→  document.querySelectorAll(".mode").forEach(m=>m.classList.remove("on"));
+   448→  document.getElementById("mode-"+t.dataset.tab).classList.add("on");
+   449→});
+   450→document.addEventListener("keydown",e=>{
+   451→  const fc=document.getElementById("mode-fc");
+   452→  if(!fc.classList.contains("on"))return;
+   453→  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+   454→  if(e.key==="ArrowRight"){ S.fcPos=(S.fcPos+1)%S.fcOrder.length; S.flipped=false; renderFc(); }
+   455→  else if(e.key==="ArrowLeft"){ S.fcPos=(S.fcPos-1+S.fcOrder.length)%S.fcOrder.length; S.flipped=false; renderFc(); }
+   456→  else if(e.key===" "){ e.preventDefault(); S.flipped=!S.flipped; renderFc(); }
+   457→});
+   458→document.getElementById("resetBtn").onclick=()=>{ if(confirm("¿Seguro que quieres borrar todo tu progreso?")){ S.learned.clear(); S.quizBest=0; save(); stats(); renderFc(); renderList(); } };
+   459→
+   460→/* ---------- CREAR TARJETAS ---------- */
+   461→function buildVocab(){
+   462→  VOCAB = BUILTIN.concat(S.custom.map(c=>({
+   463→    id:c.id, chinese:c.chinese, pinyin:c.pinyin||"—", spanish:c.spanish, part:c.part,
+   464→    sectionCode:c.part+"+",
+   465→    sectionTitle:c.part==="A"?"Mis palabras clave (personalizadas)":"Mis términos técnicos (personalizados)"
+   466→  })));
+   467→}
+   468→function nextCustomId(){ return S.custom.reduce((m,c)=>Math.max(m,c.id),900000)+1; }
+   469→function setPart(p){ S.newPart=p;
+   470→  document.querySelectorAll("[data-np]").forEach(x=>x.classList.toggle("on",x.dataset.np===p));
+   471→  document.getElementById("cHint").textContent = p==="A"
+   472→    ? "Se clasificará en “A+ — Mis palabras clave (personalizadas)” y entrará en los filtros de parte A."
+   473→    : "Se clasificará en “B+ — Mis términos técnicos (personalizados)” y entrará en los filtros de parte B.";
+   474→}
+   475→function createCard(){
+   476→  const zh=document.getElementById("cZh").value.trim();
+   477→  const py=document.getElementById("cPy").value.trim();
+   478→  const es=document.getElementById("cEs").value.trim();
+   479→  const msg=document.getElementById("cMsg");
+   480→  if(!zh||!es){ msg.className="errmsg"; msg.textContent=" Completa 汉字 y el significado en español."; return; }
+   481→  if(BUILTIN.concat(S.custom).some(w=>w.chinese===zh&&w.spanish===es)){ msg.className="errmsg"; msg.textContent="Esa tarjeta ya existe (mismo 汉字 y mismo significado)."; return; }
+   482→  S.custom.push({id:nextCustomId(), chinese:zh, pinyin:py, spanish:es, part:S.newPart});
+   483→  save(); buildVocab(); rebuildSections(); refreshDeck(); newQuiz(); newMatch(); renderCustom(); stats();
+   484→  document.getElementById("cZh").value=""; document.getElementById("cPy").value=""; document.getElementById("cEs").value="";
+   485→  msg.className="okmsg"; msg.textContent="✅ Tarjeta añadida — ya está en tus mazos ("+(S.newPart==="A"?"palabra clave":"técnico constructivo")+").";
+   486→}
+   487→function delCard(id){
+   488→  if(!confirm("¿Eliminar esta tarjeta personalizada?"))return;
+   489→  S.custom=S.custom.filter(c=>c.id!==id);
+   490→  S.learned.delete(id); save(); buildVocab(); rebuildSections(); refreshDeck(); newQuiz(); newMatch(); renderCustom(); stats();
+   491→}
+   492→function renderCustom(){
+   493→  const box=document.getElementById("cList");
+   494→  document.getElementById("cCount").textContent=S.custom.length;
+   495→  if(!S.custom.length){ box.innerHTML='<div class="empty">Aún no has creado tarjetas personalizadas.</div>'; return; }
+   496→  box.innerHTML=S.custom.map(c=>'<div class="vrow"><span class="zh cjk">'+esc(c.chinese)+'</span>'+
+   497→    '<span class="py">'+esc(c.pinyin||"—")+'</span><span class="sp">'+esc(c.spanish)+'</span>'+
+   498→    '<span class="tag">'+(c.part==="A"?"A+":"B+")+'</span>'+
+   499→    '<button class="mini" data-dc="'+c.id+'" title="Eliminar">🗑</button></div>').join("");
+   500→  box.querySelectorAll("[data-dc]").forEach(b=>b.onclick=()=>delCard(+b.dataset.dc));
+   501→}
+   502→function exportCustom(){
+   503→  const msg=document.getElementById("cMsg");
+   504→  const txt=JSON.stringify(S.custom.map(c=>({chinese:c.chinese,pinyin:c.pinyin||"",spanish:c.spanish,part:c.part})));
+   505→  const done=()=>{ msg.className="okmsg"; msg.textContent="📋 JSON copiado al portapapeles — guárdalo donde quieras."; };
+   506→  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,msg)); }
+   507→  else fallbackCopy(txt,msg);
+   508→}
+   509→function fallbackCopy(txt,msg){
+   510→  const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select();
+   511→  try{ document.execCommand("copy"); msg.className="okmsg"; msg.textContent="📋 JSON copiado."; }
+   512→  catch(e){ msg.className="errmsg"; msg.textContent="No se pudo copiar; selecciónalo manualmente."; }
+   513→  document.body.removeChild(ta);
+   514→}
+   515→function importCustom(){
+   516→  const msg=document.getElementById("cMsg"), ta=document.getElementById("cImp");
+   517→  try{
+   518→    const arr=JSON.parse(ta.value);
+   519→    if(!Array.isArray(arr))throw 0;
+   520→    let n=0;
+   521→    for(const it of arr){
+   522→      if(it&&typeof it.chinese==="string"&&typeof it.spanish==="string"&&it.chinese.trim()&&it.spanish.trim()){
+   523→        const part=it.part==="A"?"A":"B";
+   524→        S.custom.push({id:nextCustomId(),chinese:it.chinese.trim(),pinyin:typeof it.pinyin==="string"?it.pinyin.trim():"",spanish:it.spanish.trim(),part}); n++;
+   525→      }
+   526→    }
+   527→    if(n){ save(); buildVocab(); rebuildSections(); refreshDeck(); newQuiz(); newMatch(); renderCustom(); stats(); ta.value="";
+   528→      msg.className="okmsg"; msg.textContent="✅ "+n+" tarjeta(s) importada(s) con éxito."; }
+   529→    else { msg.className="errmsg"; msg.textContent="No se encontraron tarjetas válidas en el JSON."; }
+   530→  }catch(e){ msg.className="errmsg"; msg.textContent="JSON inválido — revisa el formato."; }
+   531→}
+   532→function rebuildSections(){
+   533→  const sel=document.getElementById("secSel"), prev=S.section;
+   534→  const codes=[...new Set(VOCAB.map(w=>w.sectionCode))];
+   535→  sel.innerHTML='<option value="all">Todas las secciones</option>';
+   536→  codes.forEach(c=>{ const w=VOCAB.find(v=>v.sectionCode===c);
+   537→    const o=document.createElement("option"); o.value=c; o.textContent=c+" — "+w.sectionTitle; sel.appendChild(o); });
+   538→  sel.value=codes.includes(prev)?prev:"all"; S.section=sel.value;
+   539→}
+   540→
+   541→/* ---------- init ---------- */
+   542→(function init(){
+   543→  load(); buildVocab(); stats();
+   544→  const codes=[...new Set(VOCAB.map(w=>w.sectionCode))];
+   545→  const sel=document.getElementById("secSel");
+   546→  codes.forEach(c=>{ const w=VOCAB.find(v=>v.sectionCode===c);
+   547→    const o=document.createElement("option"); o.value=c; o.textContent=c+" — "+w.sectionTitle; sel.appendChild(o); });
+   548→  refreshDeck(); newQuiz(); newMatch(); renderCustom();
+   549→  document.getElementById("cSave").onclick=createCard;
+   550→  document.querySelectorAll("[data-np]").forEach(b=>b.onclick=()=>setPart(b.dataset.np));
+   551→  setPart("B");
+   552→  document.getElementById("cExport").onclick=exportCustom;
+   553→  document.getElementById("cImpBtn").onclick=importCustom;
+   554→  document.getElementById("cImpShow").onclick=()=>{
+   555→    const t=document.getElementById("cImp"), b=document.getElementById("cImpBtn");
+   556→    const vis=t.style.display!=="none";
+   557→    t.style.display=vis?"none":"block"; b.style.display=vis?"none":"block";
+   558→  };
+   559→})();
+   560→</script>
+   561→</body>
+   562→</html>
+   563→
